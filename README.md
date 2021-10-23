@@ -1,5 +1,5 @@
 # Mirror Update Backup
-Backup a folder to a another folder by using mirror update method.
+Backup a folder to an another folder by using mirror update method.
 
 # How to use
 ## Install requirement
