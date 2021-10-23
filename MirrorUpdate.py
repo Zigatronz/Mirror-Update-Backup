@@ -11,11 +11,15 @@ parser = argparse.ArgumentParser(description='Backup a folder to an another fold
 parser.add_argument('-i', '--input', type=str, metavar='', required=True, help='Target folder')
 parser.add_argument('-o', '--output', type=str, metavar='', required=True, help='Destination folder')
 parser.add_argument('-p', '--progress', action='store_true', default=False, help='Show progress rather then verbose')
+parser.add_argument('-nm', '--nomodify', action='store_true', default=False, help='Do not compare for file modification date')
+parser.add_argument('-ns', '--nosize', action='store_true', default=False, help='Do not compare for file size')
 args = parser.parse_args()
 
 TargetFolder = args.input
 DestinationFolder = args.output
 UseProgressBar = args.progress
+NoCModify = args.nomodify
+NoCSize = args.nosize
 
 # Handle In-Out
 if not os.path.exists(TargetFolder):
@@ -59,12 +63,12 @@ for dirPath, dirNames, Filenames in os.walk(TargetFolder):
 			if not UseProgressBar:
 				print("Add        : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
 			shutil.copy2(os.path.join(dirPath, filename), DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
-		elif os.path.getmtime(os.path.join(dirPath, filename)) != os.path.getmtime(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)):
+		elif os.path.getmtime(os.path.join(dirPath, filename)) != os.path.getmtime(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)) and not NoCModify:
 			if not UseProgressBar:
 				print("Update     : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
 			os.remove(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
 			shutil.copy2(os.path.join(dirPath, filename), DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
-		elif os.path.getsize(os.path.join(dirPath, filename)) != os.path.getsize(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)):
+		elif os.path.getsize(os.path.join(dirPath, filename)) != os.path.getsize(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)) and not NoCSize:
 			if not UseProgressBar:
 				print("Replace    : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
 			os.remove(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
