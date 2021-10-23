@@ -7,7 +7,7 @@ def RemoveTopDir(path:str, top:str):
 	return path[top.__len__():]
 
 # Argument
-parser = argparse.ArgumentParser(description='Backup a folder to a another folder by using mirror update method.')
+parser = argparse.ArgumentParser(description='Backup a folder to an another folder by using mirror update method.')
 parser.add_argument('-i', '--input', type=str, metavar='', required=True, help='Target folder')
 parser.add_argument('-o', '--output', type=str, metavar='', required=True, help='Destination folder')
 parser.add_argument('-p', '--progress', action='store_true', default=False, help='Show progress rather then verbose')
