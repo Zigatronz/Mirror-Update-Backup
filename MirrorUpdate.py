@@ -55,29 +55,29 @@ for dirPath, dirNames, Filenames in os.walk(TargetFolder):
 			ProgBar.update(CurrentProgress)
 		if not exists(DestinationFolder + RemoveTopDir(dirPath, TargetFolder)):
 			os.mkdir(DestinationFolder + RemoveTopDir(dirPath, TargetFolder))
-		if not os.path.exists(DestinationFolder + RemoveTopDir(dirPath + "\\" + filename, TargetFolder)):
+		if not os.path.exists(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)):
 			if not UseProgressBar:
-				print("Add        : " + DestinationFolder + RemoveTopDir(dirPath + "\\" + filename, TargetFolder))
-			shutil.copy2(dirPath + "\\" + filename, DestinationFolder + RemoveTopDir(dirPath + "\\" + filename, TargetFolder))
-		elif os.path.getmtime(dirPath + "\\" + filename) != os.path.getmtime(DestinationFolder + RemoveTopDir(dirPath + "\\" + filename, TargetFolder)):
+				print("Add        : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+			shutil.copy2(os.path.join(dirPath, filename), DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+		elif os.path.getmtime(os.path.join(dirPath, filename)) != os.path.getmtime(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)):
 			if not UseProgressBar:
-				print("Update     : " + DestinationFolder + RemoveTopDir(dirPath + "\\" + filename, TargetFolder))
-			os.remove(DestinationFolder + RemoveTopDir(dirPath + "\\" + filename, TargetFolder))
-			shutil.copy2(dirPath + "\\" + filename, DestinationFolder + RemoveTopDir(dirPath + "\\" + filename, TargetFolder))
-		elif os.path.getsize(dirPath + "\\" + filename) != os.path.getsize(DestinationFolder + RemoveTopDir(dirPath + "\\" + filename, TargetFolder)):
+				print("Update     : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+			os.remove(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+			shutil.copy2(os.path.join(dirPath, filename), DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+		elif os.path.getsize(os.path.join(dirPath, filename)) != os.path.getsize(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)):
 			if not UseProgressBar:
-				print("Replace    : " + DestinationFolder + RemoveTopDir(dirPath + "\\" + filename, TargetFolder))
-			os.remove(DestinationFolder + RemoveTopDir(dirPath + "\\" + filename, TargetFolder))
-			shutil.copy2(dirPath + "\\" + filename, DestinationFolder + RemoveTopDir(dirPath + "\\" + filename, TargetFolder))
+				print("Replace    : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+			os.remove(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+			shutil.copy2(os.path.join(dirPath, filename), DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
 
 # Delete Non Exist Subdir Files/Folders : Destination folder != Target folder : Del(Destination folder)
 #remove files first
 for dirPath, dirNames, Filenames in os.walk(DestinationFolder):
 	for filename in Filenames:
-		if not os.path.exists(TargetFolder + RemoveTopDir(dirPath + "\\" + filename, DestinationFolder)):
+		if not os.path.exists(TargetFolder + RemoveTopDir(os.path.join(dirPath, filename), DestinationFolder)):
 			if not UseProgressBar:
-				print("Remove File: " + dirPath + "\\" + filename)
-			os.remove(dirPath + "\\" + filename)
+				print("Remove File: " + os.path.join(dirPath, filename))
+			os.remove(os.path.join(dirPath, filename))
 #remove folders
 for dirPath, dirNames, Filenames in os.walk(DestinationFolder):
 	if not Filenames:
