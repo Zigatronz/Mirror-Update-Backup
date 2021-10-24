@@ -1,6 +1,5 @@
 
 # Import dependencies
-from genericpath import exists
 import os, argparse, shutil, progressbar
 
 def RemoveTopDir(path:str, top:str):
@@ -49,7 +48,7 @@ if UseProgressBar:
 # Start Backup : Target folder ==> Destination folder
 for dirPath, dirNames, Filenames in os.walk(TargetFolder):
 	if not Filenames:
-		if not exists(DestinationFolder + RemoveTopDir(dirPath, TargetFolder)):
+		if not os.path.exists(DestinationFolder + RemoveTopDir(dirPath, TargetFolder)):
 			if not UseProgressBar:
 				print("Create Dir : " + DestinationFolder + RemoveTopDir(dirPath, TargetFolder))
 			os.mkdir(DestinationFolder + RemoveTopDir(dirPath, TargetFolder))
@@ -57,7 +56,7 @@ for dirPath, dirNames, Filenames in os.walk(TargetFolder):
 		if UseProgressBar:
 			CurrentProgress += 1
 			ProgBar.update(CurrentProgress)
-		if not exists(DestinationFolder + RemoveTopDir(dirPath, TargetFolder)):
+		if not os.path.exists(DestinationFolder + RemoveTopDir(dirPath, TargetFolder)):
 			os.mkdir(DestinationFolder + RemoveTopDir(dirPath, TargetFolder))
 		if not os.path.exists(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)):
 			if not UseProgressBar:
@@ -75,17 +74,16 @@ for dirPath, dirNames, Filenames in os.walk(TargetFolder):
 			shutil.copy2(os.path.join(dirPath, filename), DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
 
 # Delete Non Exist Subdir Files/Folders : Destination folder != Target folder : Del(Destination folder)
-#remove files first
 for dirPath, dirNames, Filenames in os.walk(DestinationFolder):
 	for filename in Filenames:
 		if not os.path.exists(TargetFolder + RemoveTopDir(os.path.join(dirPath, filename), DestinationFolder)):
-			if not UseProgressBar:
-				print("Remove File: " + os.path.join(dirPath, filename))
-			os.remove(os.path.join(dirPath, filename))
-#remove folders
-for dirPath, dirNames, Filenames in os.walk(DestinationFolder):
+			if os.path.exists(os.path.join(dirPath, filename)):
+				if not UseProgressBar:
+					print("Remove File: " + os.path.join(dirPath, filename))
+				os.remove(os.path.join(dirPath, filename))
 	if not Filenames:
-		if not exists(TargetFolder + RemoveTopDir(dirPath, DestinationFolder)):
-			if not UseProgressBar:
-				print("Remove Dir : " + dirPath)
-			os.rmdir(dirPath)
+		if not os.path.exists(TargetFolder + RemoveTopDir(dirPath, DestinationFolder)):
+			if os.path.exists(dirPath):
+				if not UseProgressBar:
+					print("Remove Dir : " + dirPath)
+				shutil.rmtree(dirPath)
