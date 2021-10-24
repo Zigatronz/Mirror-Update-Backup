@@ -11,6 +11,7 @@ Backup a folder to an another folder by using mirror update method.
       -p, --progress   Show progress rather then verbose.
       -nm, --nomodify  Do not compare for file modification date.
       -ns, --nosize    Do not compare for file size.
+      -nd, --nodelete  Do not delete files and folders that ONLY exist on the destination.
 ### For example :
       MirrorUpdate.py -i "Folder to backup" -o "Backup folder"
       MirrorUpdate.py -i "Folder to backup" -o "Backup folder" -p
