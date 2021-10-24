@@ -12,6 +12,7 @@ parser.add_argument('-o', '--output', type=str, metavar='', required=True, help=
 parser.add_argument('-p', '--progress', action='store_true', default=False, help='Show progress rather then verbose')
 parser.add_argument('-nm', '--nomodify', action='store_true', default=False, help='Do not compare for file modification date')
 parser.add_argument('-ns', '--nosize', action='store_true', default=False, help='Do not compare for file size')
+parser.add_argument('-nd', '--nodelete', action='store_true', default=False, help='Do not delete files and folders that ONLY exist on the destination')
 args = parser.parse_args()
 
 TargetFolder = args.input
@@ -19,6 +20,7 @@ DestinationFolder = args.output
 UseProgressBar = args.progress
 NoCModify = args.nomodify
 NoCSize = args.nosize
+NoDelete = args.nodelete
 
 # Handle In-Out
 if not os.path.exists(TargetFolder):
@@ -74,16 +76,17 @@ for dirPath, dirNames, Filenames in os.walk(TargetFolder):
 			shutil.copy2(os.path.join(dirPath, filename), DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
 
 # Delete Non Exist Subdir Files/Folders : Destination folder != Target folder : Del(Destination folder)
-for dirPath, dirNames, Filenames in os.walk(DestinationFolder):
-	for filename in Filenames:
-		if not os.path.exists(TargetFolder + RemoveTopDir(os.path.join(dirPath, filename), DestinationFolder)):
-			if os.path.exists(os.path.join(dirPath, filename)):
-				if not UseProgressBar:
-					print("Remove File: " + os.path.join(dirPath, filename))
-				os.remove(os.path.join(dirPath, filename))
-	if not Filenames:
-		if not os.path.exists(TargetFolder + RemoveTopDir(dirPath, DestinationFolder)):
-			if os.path.exists(dirPath):
-				if not UseProgressBar:
-					print("Remove Dir : " + dirPath)
-				shutil.rmtree(dirPath)
+if not NoDelete:
+	for dirPath, dirNames, Filenames in os.walk(DestinationFolder):
+		for filename in Filenames:
+			if not os.path.exists(TargetFolder + RemoveTopDir(os.path.join(dirPath, filename), DestinationFolder)):
+				if os.path.exists(os.path.join(dirPath, filename)):
+					if not UseProgressBar:
+						print("Remove File: " + os.path.join(dirPath, filename))
+					os.remove(os.path.join(dirPath, filename))
+		if not Filenames:
+			if not os.path.exists(TargetFolder + RemoveTopDir(dirPath, DestinationFolder)):
+				if os.path.exists(dirPath):
+					if not UseProgressBar:
+						print("Remove Dir : " + dirPath)
+					shutil.rmtree(dirPath)
