@@ -12,10 +12,12 @@ Backup a folder to an another folder by using mirror update method.
       -nm, --nomodify  Do not compare for file modification date.
       -ns, --nosize    Do not compare for file size.
       -nd, --nodelete  Do not delete files and folders that ONLY exist on the destination.
-### For example :
+      -nf, --nofail    Ignore fail and keep the thing running.
+### Examples :
       MirrorUpdate.py -i "Folder to backup" -o "Backup folder"
       MirrorUpdate.py -i "Folder to backup" -o "Backup folder" -p
       MirrorUpdate.py -i "Folder to backup" -o "Backup folder" -p -nm
+      MirrorUpdate.py -i "Folder to backup" -o "Backup folder" -p -nm -nf
       MirrorUpdate.py --input "Folder to backup" --output "Backup folder" --progress
 # How it's work
 1. **Copy/Replace** all **target files and folders** to **destination folder** as the destination folder **does not have it** or **got deference in terms of size or modification date**.
