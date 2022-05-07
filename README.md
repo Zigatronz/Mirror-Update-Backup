@@ -20,5 +20,23 @@ Backup a folder to an another folder by using mirror update method.
       MirrorUpdate.py -i "Folder to backup" -o "Backup folder" -p -nm -nf
       MirrorUpdate.py --input "Folder to backup" --output "Backup folder" --progress
 # How it's work
-1. **Copy/Replace** all **target files and folders** to **destination folder** as the destination folder **does not have it** or **got deference in terms of size or modification date**.
-2. Delete all files and folders that **ONLY** available on **destination folder**.
+Mirror target folder to destination folder:
+1. Copy/Replace from target folder to destination folder recursively.
+2. Copy/Replace job is determine by modify date and file size.
+3. Delete all files and folders that only available on destination folder.
+4. As the result, the target content will be as same as the destination content by modify date and file size.
+## --nomodify:
+File modification date will be compared
+![](img/1.png)
+File modification date will not being compared
+![](img/2.png)
+## --nosize:
+File size will be compared
+![](img/3.png)
+File size will not being compared
+![](img/4.png)
+## --nodelete:
+Files and folders will be deleted to mirroring the target folder
+![](img/5.png)
+Files and folders will not be deleted
+![](img/6.png)
