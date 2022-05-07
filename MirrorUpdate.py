@@ -25,16 +25,16 @@ NoDelete = args.nodelete
 NoFail = args.nofail
 
 # Handle In-Out
-if not os.path.exists(TargetFolder):
-	print("Target folder does not exist!")
-	exit(1)
-
-if not os.path.exists(DestinationFolder):
-	try:
-		os.mkdir(DestinationFolder)
-	except:
-		print("Something went wrong while creating destination folder.")
-		exit(2)
+if not NoFail:
+	if not os.path.exists(TargetFolder):
+		print("Target folder does not exist!")
+		exit(1)
+	if not os.path.exists(DestinationFolder):
+		try:
+			os.mkdir(DestinationFolder)
+		except:
+			print("Something went wrong while creating destination folder.")
+			exit(2)
 
 # Initialize Progress Bar
 if UseProgressBar:
@@ -55,7 +55,12 @@ for dirPath, dirNames, Filenames in os.walk(TargetFolder):
 		if not os.path.exists(DestinationFolder + RemoveTopDir(dirPath, TargetFolder)):
 			if not UseProgressBar:
 				print("Create Dir : " + DestinationFolder + RemoveTopDir(dirPath, TargetFolder))
-			os.mkdir(DestinationFolder + RemoveTopDir(dirPath, TargetFolder))
+			try:
+				os.mkdir(DestinationFolder + RemoveTopDir(dirPath, TargetFolder))
+			except:
+				print("FAILED to Create Dir : " + DestinationFolder + RemoveTopDir(dirPath, TargetFolder))
+				if not NoFail:
+					exit()
 	for filename in Filenames:
 		if UseProgressBar:
 			CurrentProgress += 1
@@ -74,8 +79,8 @@ for dirPath, dirNames, Filenames in os.walk(TargetFolder):
 		elif os.path.getmtime(os.path.join(dirPath, filename)) != os.path.getmtime(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)) and not NoCModify:
 			if not UseProgressBar:
 				print("Update     : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
-			os.remove(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
 			try:
+				os.remove(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
 				shutil.copy2(os.path.join(dirPath, filename), DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
 			except:
 				print("FAILED to Update     : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
@@ -84,8 +89,8 @@ for dirPath, dirNames, Filenames in os.walk(TargetFolder):
 		elif os.path.getsize(os.path.join(dirPath, filename)) != os.path.getsize(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)) and not NoCSize:
 			if not UseProgressBar:
 				print("Replace    : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
-			os.remove(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
 			try:
+				os.remove(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
 				shutil.copy2(os.path.join(dirPath, filename), DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
 			except:
 				print("FAILED to Replace    : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
