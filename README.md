@@ -13,11 +13,12 @@ Backup a folder to an another folder by using mirror update method.
       -ns, --nosize    Do not compare for file size.
       -nd, --nodelete  Do not delete files and folders that ONLY exist on the destination.
       -nf, --nofail    Ignore fail and keep the thing running.
+      -ie, --ignoreext Do not backup specific extension, example: "-ie png,jpg,exe"
 ### Examples :
       MirrorUpdate.py -i "Folder to backup" -o "Backup folder"
       MirrorUpdate.py -i "Folder to backup" -o "Backup folder" -p
       MirrorUpdate.py -i "Folder to backup" -o "Backup folder" -p -nm
-      MirrorUpdate.py -i "Folder to backup" -o "Backup folder" -p -nm -nf
+      MirrorUpdate.py -i "Folder to backup" -o "Backup folder" -p -nm -nf -ie mp4,mp3
       MirrorUpdate.py --input "Folder to backup" --output "Backup folder" --progress
 # How it's work
 Mirror target folder to destination folder:

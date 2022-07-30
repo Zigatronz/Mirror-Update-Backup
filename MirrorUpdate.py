@@ -7,22 +7,29 @@ def RemoveTopDir(path:str, top:str):
 
 # Argument
 parser = argparse.ArgumentParser(description='Backup a folder to an another folder by using mirror update method.')
+
 parser.add_argument('-i', '--input', type=str, metavar='', required=True, help='Target folder')
 parser.add_argument('-o', '--output', type=str, metavar='', required=True, help='Destination folder')
 parser.add_argument('-p', '--progress', action='store_true', default=False, help='Show progress rather then verbose')
+
 parser.add_argument('-nm', '--nomodify', action='store_true', default=False, help='Do not compare for file modification date')
 parser.add_argument('-ns', '--nosize', action='store_true', default=False, help='Do not compare for file size')
 parser.add_argument('-nd', '--nodelete', action='store_true', default=False, help='Do not delete files and folders that ONLY exist on the destination')
 parser.add_argument('-nf', '--nofail', action='store_true', default=False, help='Ignore fail and keep the thing running')
+
+parser.add_argument('-ie', '--ignoreext', type=str, metavar='', default='', help='Don\'t backup specific extension, example: "-ie png,jpg,exe"')
 args = parser.parse_args()
 
 TargetFolder = args.input
 DestinationFolder = args.output
 UseProgressBar = args.progress
+
 NoCModify = args.nomodify
 NoCSize = args.nosize
 NoDelete = args.nodelete
 NoFail = args.nofail
+
+IgnoreExt = str(args.ignoreext).split(',')
 
 # Handle In-Out
 if not NoFail:
@@ -51,6 +58,7 @@ if UseProgressBar:
 
 # Start Backup : Target folder ==> Destination folder
 for dirPath, dirNames, Filenames in os.walk(TargetFolder):
+	# directory job
 	if not Filenames:
 		if not os.path.exists(DestinationFolder + RemoveTopDir(dirPath, TargetFolder)):
 			if not UseProgressBar:
@@ -61,41 +69,49 @@ for dirPath, dirNames, Filenames in os.walk(TargetFolder):
 				print("FAILED to Create Dir : " + DestinationFolder + RemoveTopDir(dirPath, TargetFolder))
 				if not NoFail:
 					exit()
+	# files job
 	for filename in Filenames:
 		if UseProgressBar:
 			CurrentProgress += 1
 			ProgBar.update(CurrentProgress)
+		# make parent folder if it isn't there
 		if not os.path.exists(DestinationFolder + RemoveTopDir(dirPath, TargetFolder)):
 			os.mkdir(DestinationFolder + RemoveTopDir(dirPath, TargetFolder))
-		if not os.path.exists(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)):
-			if not UseProgressBar:
-				print("Add        : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
-			try:
-				shutil.copy2(os.path.join(dirPath, filename), DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
-			except:
-				print("FAILED to Add        : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
-				if not NoFail:
-					exit()
-		elif os.path.getmtime(os.path.join(dirPath, filename)) != os.path.getmtime(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)) and not NoCModify:
-			if not UseProgressBar:
-				print("Update     : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
-			try:
-				os.remove(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
-				shutil.copy2(os.path.join(dirPath, filename), DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
-			except:
-				print("FAILED to Update     : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
-				if not NoFail:
-					exit()
-		elif os.path.getsize(os.path.join(dirPath, filename)) != os.path.getsize(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)) and not NoCSize:
-			if not UseProgressBar:
-				print("Replace    : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
-			try:
-				os.remove(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
-				shutil.copy2(os.path.join(dirPath, filename), DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
-			except:
-				print("FAILED to Replace    : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
-				if not NoFail:
-					exit()
+		# grab file extention extention
+		file_extension = str(os.path.splitext(filename)[1]).lstrip('.')
+		if not file_extension in IgnoreExt:
+			if not os.path.exists(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)):
+				# destination file not exist
+				if not UseProgressBar:
+					print("Add        : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+				try:
+					shutil.copy2(os.path.join(dirPath, filename), DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+				except:
+					print("FAILED to Add        : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+					if not NoFail:
+						exit()
+			elif os.path.getmtime(os.path.join(dirPath, filename)) != os.path.getmtime(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)) and not NoCModify:
+				# destination file is diffrent modify date
+				if not UseProgressBar:
+					print("Update     : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+				try:
+					os.remove(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+					shutil.copy2(os.path.join(dirPath, filename), DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+				except:
+					print("FAILED to Update     : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+					if not NoFail:
+						exit()
+			elif os.path.getsize(os.path.join(dirPath, filename)) != os.path.getsize(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)) and not NoCSize:
+				# destination file is diffrent size
+				if not UseProgressBar:
+					print("Replace    : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+				try:
+					os.remove(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+					shutil.copy2(os.path.join(dirPath, filename), DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+				except:
+					print("FAILED to Replace    : " + DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder))
+					if not NoFail:
+						exit()
 
 # Delete Non Exist Subdir Files/Folders : Destination folder != Target folder : Del(Destination folder)
 if not NoDelete:
