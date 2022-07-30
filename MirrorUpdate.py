@@ -29,7 +29,7 @@ NoCSize = args.nosize
 NoDelete = args.nodelete
 NoFail = args.nofail
 
-IgnoreExt = str(args.ignoreext).split(',')
+IgnoreExt = str(args.ignoreext).lower().split(',')
 
 # Handle In-Out
 if not NoFail:
@@ -78,8 +78,7 @@ for dirPath, dirNames, Filenames in os.walk(TargetFolder):
 		if not os.path.exists(DestinationFolder + RemoveTopDir(dirPath, TargetFolder)):
 			os.mkdir(DestinationFolder + RemoveTopDir(dirPath, TargetFolder))
 		# grab file extention extention
-		file_extension = str(os.path.splitext(filename)[1]).lstrip('.')
-		if not file_extension in IgnoreExt:
+		if not str(os.path.splitext(filename)[1]).lstrip('.').lower() in IgnoreExt:
 			if not os.path.exists(DestinationFolder + RemoveTopDir(os.path.join(dirPath, filename), TargetFolder)):
 				# destination file not exist
 				if not UseProgressBar:
